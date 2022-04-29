@@ -19,7 +19,6 @@ c2_dat2
 c2_dat2 contains data that was sampled from an unbalanced cross-classified design.
 }
 \examples{
-
 # loading lme4
 library(lme4)
 
@@ -28,9 +27,9 @@ fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)
 summary(fit)
 
 # Prediction interval using c2_dat2 as future data
-lmer_pi(model=fit, newdat=c2_dat2, alternative="both", nboot=100)
+\donttest{lmer_pi_unstruc(model=fit, newdat=c2_dat2, alternative="both", nboot=100)}
 
-# Please note that nboot was set to 100 in order to increase computing time
+# Please note that nboot was set to 100 in order to decrease computing time
 # of the example. For a valid analysis set nboot=10000.
 
 }

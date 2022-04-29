@@ -61,6 +61,8 @@ If \code{newdat} is specified: A \code{data.frame} that contains the future data
 
  If \code{alternative} is set to "upper": Upper prediction bounds are computed instead
  of a prediction interval.
+
+ If traceplot=TRUE, a graphical overview about the bisection process is given.
 }
 \description{
 beta_bin_pi calculates bootstrap calibrated prediction intervals for
@@ -78,9 +80,7 @@ Please note that the predicted future number of successes is based on the future
 cluster size \eqn{n_m} and the success probability estimated from the historical
 data \eqn{\pi^{hist}} such that \eqn{\hat{y}_m=\pi^{hist} n_m}. Hence, the
 prediction intervals \eqn{[l,u]_m} are different for each of the \eqn{m} future clusters,
-if their size is not the same. \cr
-If traceplot=TRUE, a graphical
-overview about the bisection process is given.
+if their size is not the same.
 }
 \examples{
 # Historical data
@@ -92,11 +92,11 @@ bb_dat2
 # Prediction interval using bb_dat2 as future data
 beta_bin_pi(histdat=bb_dat1, newdat=bb_dat2, nboot=100)
 
-# Upper prediction bound for m=3 future number of successes
+# Upper prediction bound for m=3 future numbers of success
 # that are based on cluster sizes 40, 50, 60 respectively
 beta_bin_pi(histdat=bb_dat1, newsize=c(40, 50, 60), alternative="upper", nboot=100)
 
-# Please note that nboot was set to 100 in order to increase computing time
+# Please note that nboot was set to 100 in order to decrease computing time
 # of the example. For a valid analysis set nboot=10000.
 
 
