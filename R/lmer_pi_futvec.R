@@ -15,8 +15,9 @@
 #' if a prediction interval or an upper or a lower prediction limit should be computed
 #' @param alpha defines the level of confidence (1-\code{alpha})
 #' @param nboot number of bootstraps
-#' @param lambda_min lower start value for bisection
-#' @param lambda_max upper start value for bisection
+#' @param delta_min lower start value for bisection
+#' @param delta_max upper start value for bisection
+#' @param tolerance tolerance for the coverage probability in the bisection
 #' @param traceplot plot for visualization of the bisection process
 #' @param n_bisec maximal number of bisection steps
 #'
@@ -63,6 +64,7 @@
 #' @importFrom lme4 fixef VarCorr bootMer
 #' @importFrom stats vcov
 #' @importFrom stats na.omit
+#' @importFrom methods is
 #'
 #' @references Menssen, M., Schaarschmidt, F.: Prediction intervals for all of M
 #' future observations based on linear random effects models. Statistica Neerlandica.
@@ -73,7 +75,7 @@
 #' # loading lme4
 #' library(lme4)
 #'
-#' # Fitting a random effects model based on c2_dat_1
+#' # Fitting a random effects model based on c2_dat1
 #' fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)
 #' summary(fit)
 #'
@@ -110,15 +112,16 @@ lmer_pi_futvec <- function(model,
                            alternative="both",
                            alpha=0.05,
                            nboot=10000,
-                           lambda_min=0.01,
-                           lambda_max=10,
+                           delta_min=0.01,
+                           delta_max=10,
+                           tolerance = 1e-3,
                            traceplot=TRUE,
                            n_bisec=30){
 
         # warning("This function needs some work.")
 
         # Model must be of class lmerMod
-        if(class(model) != "lmerMod"){
+        if(!is(model, "lmerMod")){
                 stop("class(model) != lmerMod")
         }
 
@@ -413,7 +416,7 @@ lmer_pi_futvec <- function(model,
         #----------------------------------------------------------------------
         ### Bisection
 
-        bisection <- function(f, quant_min, quant_max, n, tol = 1e-3) {
+        bisection <- function(f, quant_min, quant_max, n, tol = tolerance) {
 
 
                 c_i <- vector()
@@ -540,7 +543,7 @@ lmer_pi_futvec <- function(model,
         }
 
         # Calculation of the degreees of freedom
-        quant_calib <- bisection(f=coverfun, quant_min=lambda_min, quant_max=lambda_max, n=n_bisec)
+        quant_calib <- bisection(f=coverfun, quant_min=delta_min, quant_max=delta_max, n=n_bisec)
 
         #----------------------------------------------------------------------
 

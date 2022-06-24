@@ -15,8 +15,9 @@
 #' should be computed
 #' @param alpha defines the level of confidence (1-\code{alpha})
 #' @param nboot number of bootstraps
-#' @param lambda_min lower start value for bisection
-#' @param lambda_max upper start value for bisection
+#' @param delta_min lower start value for bisection
+#' @param delta_max upper start value for bisection
+#' @param tolerance tolerance for the coverage probability in the bisection
 #' @param traceplot plot for visualization of the bisection process
 #' @param n_bisec maximal number of bisection steps
 #'
@@ -82,8 +83,9 @@ beta_bin_pi <- function(histdat,
                         alternative="both",
                         alpha=0.05,
                         nboot=10000,
-                        lambda_min=0.01,
-                        lambda_max=10,
+                        delta_min=0.01,
+                        delta_max=10,
+                        tolerance = 1e-3,
                         traceplot=TRUE,
                         n_bisec=30){
 
@@ -120,6 +122,7 @@ beta_bin_pi <- function(histdat,
         histdat$total <- histdat[,1] + histdat[,2]
 
         n <- nrow(histdat)
+        N_hist <- sum(histdat$total)
 
         #-----------------------------------------------------------------------
 
@@ -196,7 +199,7 @@ beta_bin_pi <- function(histdat,
         }
 
         #-----------------------------------------------------------------------
-        ### Sampling of future data
+        ### Sampling of bootstrap data
 
         fut_dat_list <- vector(length=nboot, "list")
 
@@ -209,7 +212,7 @@ beta_bin_pi <- function(histdat,
                 # Total number of future trials
                 fut_dat$total <- fut_dat[,1] + fut_dat[,2]
 
-                # Sampling of the data on which pi and phi is estimated
+                # Sampling of historical data on which pi and phi is estimated
                 bs_pi_se_dat <- rbbinom(n = n, size = histdat$total,
                                         prob = pi_hat, rho = rho_hat)
 
@@ -242,6 +245,10 @@ beta_bin_pi <- function(histdat,
                 bs_rho <- unname(max(1e-5, bs_pi_rho[2]))
                 fut_dat$bs_rho <- bs_rho
 
+                # Total number of observations per hist. bs-data
+                bs_N <- sum(bs_pi_se_dat$total)
+                fut_dat$bs_N <- bs_N
+
                 # calculation of the prediction se and y_hat
                 fut_dat$pred_se <- NA
 
@@ -250,23 +257,19 @@ beta_bin_pi <- function(histdat,
 
                         bs_n_fut <- fut_dat$total[d]
 
+                        # Variance for the fut. random variable
                         bs_fut_var_y <-(bs_n_fut*bs_pi*(1-bs_pi))*(1+(bs_n_fut-1)*bs_rho)
 
-                        bs_fut_var <- bs_fut_var_y*(1+bs_n_fut/sum(bs_pi_se_dat$total))
+                        # Variance for the prediction
+                        bs_fut_var_y_hat <- bs_n_fut* (bs_pi*(1-bs_pi))/bs_N +
+                                bs_n_fut * bs_pi*(1-bs_pi) * bs_rho * (bs_N-1)/bs_N
+
+                        # bs_fut_var_old <- bs_fut_var_y*(1+bs_n_fut/sum(bs_pi_se_dat$total))
+
+                        bs_fut_var <- bs_fut_var_y + bs_fut_var_y_hat
 
                         fut_dat$pred_se[d] <- sqrt(bs_fut_var)
-
-                        if(is.na(sqrt(bs_fut_var))){
-                                print("c(bs_n_fut, bs_pi, bs_rho, bs_fut_var_y, bs_fut_var)")
-                                print(c(bs_n_fut, bs_pi, bs_rho, bs_fut_var_y, bs_fut_var))
-
-                                print("fut_dat")
-                                print(fut_dat)
-                        }
-
                 }
-
-
 
                 # calculation of y_hat
                 fut_dat$y_hat <- fut_dat$total * fut_dat$bs_pi
@@ -278,7 +281,7 @@ beta_bin_pi <- function(histdat,
         #-----------------------------------------------------------------------
         ### Calculation of the PIs
 
-        pi_cover_fun <- function(input, lambda){
+        pi_cover_fun <- function(input, delta){
 
                 input$lower <- NA
                 input$upper <- NA
@@ -295,8 +298,8 @@ beta_bin_pi <- function(histdat,
 
                         # Prediction interval
                         if(alternative=="both"){
-                                lower <- y_hat - lambda * pred_se
-                                upper <- y_hat + lambda * pred_se
+                                lower <- y_hat - delta * pred_se
+                                upper <- y_hat + delta * pred_se
 
                                 input$lower[e] <- lower
                                 input$upper[e] <- upper
@@ -306,7 +309,7 @@ beta_bin_pi <- function(histdat,
 
                         # Lower prediction bound
                         if(alternative=="lower"){
-                                lower <- y_hat - lambda * pred_se
+                                lower <- y_hat - delta * pred_se
 
                                 input$lower[e] <- lower
 
@@ -315,7 +318,7 @@ beta_bin_pi <- function(histdat,
 
                         # Upper prediction bound
                         if(alternative=="upper"){
-                                upper <- y_hat + lambda * pred_se
+                                upper <- y_hat + delta * pred_se
 
                                 input$upper[e] <- upper
 
@@ -331,10 +334,10 @@ beta_bin_pi <- function(histdat,
                 return(cover)
         }
 
-        # Coverage for one lambda based on the BS samples
-        cover_fun <- function(lambda){
+        # Coverage for one delta based on the BS samples
+        cover_fun <- function(delta){
 
-                fut_cover_list <- lapply(X=fut_dat_list, FUN=pi_cover_fun, lambda=lambda)
+                fut_cover_list <- lapply(X=fut_dat_list, FUN=pi_cover_fun, delta=delta)
 
                 fut_cover_vec <- as.logical(fut_cover_list)
 
@@ -350,7 +353,7 @@ beta_bin_pi <- function(histdat,
 
         }
 
-        bisection <- function(f, quant_min, quant_max, n, tol = 1e-3) {
+        bisection <- function(f, quant_min, quant_max, n, tol=tolerance) {
 
 
                 c_i <- vector()
@@ -475,8 +478,8 @@ beta_bin_pi <- function(histdat,
 
         # Calculation of the quantile
         quant_calib <- bisection(f=cover_fun,
-                                 quant_min=lambda_min,
-                                 quant_max=lambda_max,
+                                 quant_min=delta_min,
+                                 quant_max=delta_max,
                                  n=n_bisec)
 
         newdat$quant_calib <- quant_calib
@@ -510,8 +513,12 @@ beta_bin_pi <- function(histdat,
                 # variance of y
                 bs_fut_var_y <-(n_fut*pi_hat*(1-pi_hat))*(1+(n_fut-1)*rho_hat)
 
+                # variance of y_hat
+                bs_fut_var_y_hat <- n_fut * pi_hat * (1-pi_hat) / N_hist +
+                        n_fut * pi_hat * (1-pi_hat) * rho_hat * (N_hist-1)/N_hist
+
                 # var(y_hat-y)
-                fut_var <- bs_fut_var_y*(1+n_fut/sum(histdat$total))
+                fut_var <- bs_fut_var_y + bs_fut_var_y_hat
 
                 # se(y_hat-y)
                 newdat$pred_se[d] <- sqrt(fut_var)

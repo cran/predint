@@ -49,6 +49,7 @@
 #' @importFrom graphics abline lines
 #' @importFrom lme4 fixef VarCorr bootMer
 #' @importFrom stats vcov
+#' @importFrom methods is
 #'
 #' @examples
 #'
@@ -83,7 +84,7 @@ lmer_pi <- function(model,
                 Please use lmer_pi_unstruc() which has exactly the same functionality.")
 
         # Model must be of class lmerMod
-        if(class(model) != "lmerMod"){
+        if(!is(model, "lmerMod")){
                 stop("class(model) != lmerMod")
         }
 

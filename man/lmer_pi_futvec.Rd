@@ -11,8 +11,9 @@ lmer_pi_futvec(
   alternative = "both",
   alpha = 0.05,
   nboot = 10000,
-  lambda_min = 0.01,
-  lambda_max = 10,
+  delta_min = 0.01,
+  delta_max = 10,
+  tolerance = 0.001,
   traceplot = TRUE,
   n_bisec = 30
 )
@@ -34,9 +35,11 @@ if a prediction interval or an upper or a lower prediction limit should be compu
 
 \item{nboot}{number of bootstraps}
 
-\item{lambda_min}{lower start value for bisection}
+\item{delta_min}{lower start value for bisection}
 
-\item{lambda_max}{upper start value for bisection}
+\item{delta_max}{upper start value for bisection}
+
+\item{tolerance}{tolerance for the coverage probability in the bisection}
 
 \item{traceplot}{plot for visualization of the bisection process}
 
@@ -91,7 +94,7 @@ mimic the future data.
 # loading lme4
 library(lme4)
 
-# Fitting a random effects model based on c2_dat_1
+# Fitting a random effects model based on c2_dat1
 fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)
 summary(fit)
 

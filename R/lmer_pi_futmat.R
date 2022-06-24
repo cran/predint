@@ -1,7 +1,7 @@
 
 #' Prediction intervals for future observations based on linear random effects models
 #'
-#' lmer_pi_futmat calculates a bootstrap calibrated prediction interval for one or more
+#' \code{lmer_pi_futmat()} calculates a bootstrap calibrated prediction interval for one or more
 #' future observation(s) based on linear random effects models. With this approach,
 #' the sampling structure of the future data is taken into account (see below).
 #'
@@ -13,8 +13,9 @@
 #' if a prediction interval or an upper or a lower prediction limit should be computed
 #' @param alpha defines the level of confidence (1-\code{alpha})
 #' @param nboot number of bootstraps
-#' @param lambda_min lower start value for bisection
-#' @param lambda_max upper start value for bisection
+#' @param delta_min lower start value for bisection
+#' @param delta_max upper start value for bisection
+#' @param tolerance tolerance for the coverage probability in the bisection
 #' @param traceplot plot for visualization of the bisection process
 #' @param n_bisec maximal number of bisection steps
 #'
@@ -68,6 +69,7 @@
 #' @importFrom graphics abline lines
 #' @importFrom lme4 fixef VarCorr bootMer lFormula
 #' @importFrom stats vcov rnorm var
+#' @importFrom methods is
 #'
 #'
 #' @references Menssen, M., Schaarschmidt, F.: Prediction intervals for all of M
@@ -79,7 +81,7 @@
 #' # loading lme4
 #' library(lme4)
 #'
-#' # Fitting a random effects model based on c2_dat_1
+#' # Fitting a random effects model based on c2_dat1
 #' \donttest{fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)}
 #' \donttest{summary(fit)}
 #'
@@ -136,13 +138,14 @@ lmer_pi_futmat <- function(model,
                            alternative="both",
                            alpha=0.05,
                            nboot=10000,
-                           lambda_min=0.01,
-                           lambda_max=10,
+                           delta_min=0.01,
+                           delta_max=10,
+                           tolerance = 1e-3,
                            traceplot=TRUE,
                            n_bisec=30){
 
         # Model must be of class lmerMod
-        if(class(model) != "lmerMod"){
+        if(!is(model, "lmerMod")){
                 stop("class(model) != lmerMod")
         }
 
@@ -230,8 +233,9 @@ lmer_pi_futmat <- function(model,
                                     data.frame(VarCorr(model))$vcov)))
 
         #----------------------------------------------------------------------
-        ### Bootstrapping future observations if newdat is given
+        ### Bootstrapping of future observations
 
+        # If newdat=1
         if(!is.null(newdat) & is.null(futmat_list)){
 
                 if(is.data.frame(newdat)==FALSE){
@@ -264,6 +268,7 @@ lmer_pi_futmat <- function(model,
 
                 }
 
+                # If newdat is a data.frame
                 else{
                         # SD for the random factors
                         sd_hist <- as.data.frame(VarCorr(model))[,c("grp", "sdcor")]
@@ -340,7 +345,7 @@ lmer_pi_futmat <- function(model,
                 sd_hist <- as.data.frame(VarCorr(model))[,c("grp", "sdcor")]
 
                 if(length(names(futmat_list)) != length(sd_hist$grp)){
-                        stop("length(names(futmat_list)) is not the same as the random effects plus the residuals")
+                        stop("length(names(futmat_list)) is not the same as the number of random factors plus the residuals")
                 }
 
                 if(!all(unlist(lapply(X=futmat_list, FUN=is.matrix)))){
@@ -358,7 +363,7 @@ lmer_pi_futmat <- function(model,
                 }
 
                 if(all(sd_hist$grp == names(futmat_list))==FALSE){
-                        stop("futmat_list needs to have the same names as the random effects in the model. Maybe you forgot the residuals?")
+                        stop("futmat_list needs to have the same names as the random factors in the model. Maybe you forgot the residuals?")
                 }
 
                 else{
@@ -540,7 +545,7 @@ lmer_pi_futmat <- function(model,
         #----------------------------------------------------------------------
         ### Bisection
 
-        bisection <- function(f, quant_min, quant_max, n, tol = 1e-3) {
+        bisection <- function(f, quant_min, quant_max, n, tol = tolerance) {
 
 
                 c_i <- vector()
@@ -667,7 +672,7 @@ lmer_pi_futmat <- function(model,
         }
 
         # Calculation of the calibrated coefficient
-        quant_calib <- bisection(f=coverfun, quant_min=lambda_min, quant_max=lambda_max, n=n_bisec)
+        quant_calib <- bisection(f=coverfun, quant_min=delta_min, quant_max=delta_max, n=n_bisec)
 
         #----------------------------------------------------------------------
 
