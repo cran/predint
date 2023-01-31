@@ -17,4 +17,19 @@ functions are lmer_pi_unstruc(), lmer_pi_futvec() and lmer_pi_futmat().
 * Bugfix in rbbinom: rho must be bigger than 0 but smaller than 1
 * Function for the sampling of bs-data based on a random effects model fit with lme4::lmer()
   as used in lmer_pi_futmat()
+  
+# predint 2.0.0
+* the package is now based on s3 objects
+* the calibration algorithm works now independently for both limits 
+        (default for discrete intervals)
+* rqpois() can be used with offsets and returns a data.frame (instead of a
+        vector as before)
+* quasi_pois_pi() works now with offsets and based on the modified calibration algorithm
+* new functions
+    - summary.predint 
+    - plot.predint 
+    - as.data.frame.predint
+    - print.predint
+
+
 

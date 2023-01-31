@@ -2,12 +2,12 @@
 % Please edit documentation in R/quasi_pois_pi.R
 \name{quasi_pois_pi}
 \alias{quasi_pois_pi}
-\title{Prediction intervals for quasi-poisson data}
+\title{Prediction intervals for quasi-Poisson data}
 \usage{
 quasi_pois_pi(
   histdat,
   newdat = NULL,
-  m = NULL,
+  newoffset = NULL,
   alternative = "both",
   alpha = 0.05,
   nboot = 10000,
@@ -15,21 +15,27 @@ quasi_pois_pi(
   delta_max = 10,
   tolerance = 0.001,
   traceplot = TRUE,
-  n_bisec = 30
+  n_bisec = 30,
+  algorithm = "MS22mod"
 )
 }
 \arguments{
-\item{histdat}{a \code{data.frame} with one column containing the historical data}
+\item{histdat}{a \code{data.frame} with two columns. The first has to contain
+the historical observations. The second has to contain the number of experimental
+units per study (offsets).}
 
-\item{newdat}{a \code{data.frame} with one column containing the future data}
+\item{newdat}{a \code{data.frame} with two columns. The first has to contain
+the future observations. The second has to contain the number of experimental
+units per study (offsets).}
 
-\item{m}{number of future clusters}
+\item{newoffset}{vector with future number of experimental units per historical
+study.}
 
 \item{alternative}{either "both", "upper" or "lower".
 \code{alternative} specifies if a prediction interval or
 an upper or a lower prediction limit should be computed}
 
-\item{alpha}{defines the level of confidence (1-alpha)}
+\item{alpha}{defines the level of confidence (\eqn{1-\alpha})}
 
 \item{nboot}{number of bootstraps}
 
@@ -39,39 +45,49 @@ an upper or a lower prediction limit should be computed}
 
 \item{tolerance}{tolerance for the coverage probability in the bisection}
 
-\item{traceplot}{plot for visualization of the bisection process}
+\item{traceplot}{if \code{TRUE}: Plot for visualization of the bisection process}
 
 \item{n_bisec}{maximal number of bisection steps}
+
+\item{algorithm}{either "MS22" or "MS22mod" (see details)}
 }
 \value{
-If \code{newdat} is specified: A \code{data.frame} that contains the future data,
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction error (pred_se), the prediction interval (lower and upper)
- and a statement if the prediction interval covers the future observation (cover).
-
- If \code{m} is specified: A \code{data.frame} that contains the number of future observations (m)
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction error (pred_se) and the prediction interval (lower and upper).
-
- If \code{alternative} is set to "lower": Lower prediction bounds are computed instead
- of a prediction interval.
-
- If \code{alternative} is set to "upper": Upper prediction bounds are computed instead
- of a prediction interval.
-
- If \code{traceplot=TRUE}, a graphical overview about the bisection process is given.
+\code{quasi_pois_pi} returns an object of class \code{c("predint", "quasiPoissonPI")}
+with prediction intervals or limits in the first entry (\code{$prediction}).
 }
 \description{
-quasi_pois_pi calculates bootstrap calibrated prediction intervals for poisson
-data with constant overdispersion (quasi-poisson).
+\code{quasi_pois_pi()} calculates bootstrap calibrated prediction intervals for Poisson
+data with constant overdispersion (quasi-Poisson).
 }
 \details{
-This function returns a bootstrap calibrated prediction interval
-\deqn{[l,u] = \hat{y} \pm q \sqrt{\hat{var}(\hat{y} - y)}}
-with \eqn{\hat{y}} as the predicted future observation,
-\eqn{y} as the observed future observations, \eqn{\sqrt{\hat{var}(\hat{y} - y)}}
-as the prediction error and \eqn{q} as the bootstrap calibrated coefficient that
-approximates a quantile of a multivariate normal distribution. \cr
+This function returns bootstrap-calibrated prediction intervals as well as
+lower or upper prediction limits.
+
+If \code{algorithm} is set to "MS22", both limits of the prediction interval
+are calibrated simultaneously using the algorithm described in Menssen and
+Schaarschmidt (2022), section 3.2.4. The calibrated prediction interval is given
+as
+
+\deqn{[l,u]_m = n^*_m \hat{\lambda} \pm q^{calib} \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+ \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}}}
+
+with \eqn{n^*_m} as the number of experimental units in the future clusters,
+\eqn{\hat{\lambda}} as the estimate for the Poisson mean obtained from the
+historical data, \eqn{q^{calib}} as the bootstrap-calibrated coefficient,
+\eqn{\hat{\phi}} as the estimate for the dispersion parameter
+and \eqn{n_h} as the number of experimental units per historical cluster. \cr
+
+If \code{algorithm} is set to "MS22mod", both limits of the prediction interval
+are calibrated independently from each other. The resulting prediction interval
+is given by
+
+\deqn{[l,u] = \Big[n^*_m \hat{\lambda} \pm q^{calib}_l \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+ \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}}, \quad
+ n^*_m \hat{\lambda} \pm q^{calib}_u \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+ \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}} \Big]}
+
+Please note, that this modification does not affect the calibration procedure, if only
+prediction limits are of interest.
 }
 \examples{
 #' # Historical data
@@ -81,12 +97,19 @@ qp_dat1
 qp_dat2
 
 # Prediction interval using bb_dat2 as future data
-quasi_pois_pi(histdat=data.frame(qp_dat1), newdat=data.frame(qp_dat2), nboot=100)
+pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+summary(pred_int)
 
 # Upper prediction bound for m=3 future observations
-quasi_pois_pi(histdat=data.frame(qp_dat1), m=3, alternative="upper", nboot=100)
+pred_u <- quasi_pois_pi(histdat=qp_dat1, newoffset=c(1,2,1), alternative="upper", nboot=100)
+summary(pred_u)
 
 # Please note that nboot was set to 100 in order to decrease computing time
 # of the example. For a valid analysis set nboot=10000.
 
+}
+\references{
+Menssen and Schaarschmidt (2022): Prediction intervals for all of M future
+observations based on linear random effects models. Statistica Neerlandica,
+ \doi{10.1111/stan.12260}
 }

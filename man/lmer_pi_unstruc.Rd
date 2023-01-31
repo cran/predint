@@ -15,7 +15,8 @@ lmer_pi_unstruc(
   delta_max = 10,
   tolerance = 0.001,
   traceplot = TRUE,
-  n_bisec = 30
+  n_bisec = 30,
+  algorithm = "MS22"
 )
 }
 \arguments{
@@ -39,46 +40,54 @@ if a prediction interval or an upper or a lower prediction limit should be compu
 
 \item{tolerance}{tolerance for the coverage probability in the bisection}
 
-\item{traceplot}{plot for visualization of the bisection process}
+\item{traceplot}{if \code{TRUE}: Plot for visualization of the bisection process}
 
 \item{n_bisec}{maximal number of bisection steps}
+
+\item{algorithm}{either "MS22" or "MS22mod" (see details)}
 }
 \value{
-If \code{newdat} is specified: A \code{data.frame} that contains the future data,
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction standard error (pred_se), the prediction interval (lower and upper)
- and a statement if the prediction interval covers the future observation (cover).
-
- If \code{m} is specified: A \code{data.frame} that contains the number of future observations (m)
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction standard error (pred_se) and the prediction interval (lower and upper).
-
- If \code{alternative} is set to "lower": Lower prediction limits are computed instead
- of a prediction interval.
-
- If \code{alternative} is set to "upper": Upper prediction limits are computed instead
- of a prediction interval.
-
- If \code{traceplot=TRUE}, a graphical overview about the bisection process is given.
+\code{lmer_pi_futvec()} returns an object of class \code{c("predint", "normalPI")}
+with prediction intervals or limits in the first entry (\code{$prediction}).
 }
 \description{
-lmer_pi_unstruc calculates a bootstrap calibrated prediction interval for one or more
+\code{lmer_pi_unstruc()} calculates a bootstrap calibrated prediction interval for one or more
 future observation(s) based on linear random effects models as described in section
-3.2.4. of Menssen and Schaarschmidt (2021).
+3.2.4. of Menssen and Schaarschmidt (2022).
 Please note, that the bootstrap calibration used here does not consider the sampling
 structure of the future data, since the calibration values are drawn randomly from
 bootstrap data sets that have the same structure as the historical data.
 }
 \details{
-This function returns a bootstrap calibrated prediction interval
-\deqn{[l,u] = \hat{y} \pm q \sqrt{\hat{var}(\hat{y} - y)}}
-with \eqn{\hat{y}} as the predicted future observation,
-\eqn{y} as the observed future observations, \eqn{\sqrt{\hat{var}(\hat{y} - y)}}
-as the prediction standard error and \eqn{q} as the bootstrap calibrated coefficient that
-approximates a quantile of the multivariate t-distribution. \cr
-Please note that this function relies on linear random effects models that are
-fitted with lmer() from the lme4 package. Random effects have to be specified as
-\code{(1|random_effect)}.\cr
+This function returns bootstrap-calibrated prediction intervals as well as
+lower or upper prediction limits.
+
+If \code{algorithm} is set to "MS22", both limits of the prediction interval
+are calibrated simultaneously using the algorithm described in Menssen and
+Schaarschmidt (2022), section 3.2.4. The calibrated prediction interval is given
+as
+
+\deqn{[l,u] = \hat{\mu} \pm q^{calib} \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1}
+\hat{\sigma}^2_c}}
+
+with \eqn{\hat{\mu}} as the expected future observation (historical mean) and
+\eqn{\hat{\sigma}^2_c} as the \eqn{c=1, 2, ..., C} variance components and \eqn{\hat{\sigma}^2_{C+1}}
+as the residual variance obtained from the random
+effects model fitted with \code{lme4::lmer()} and \eqn{q^{calib}} as the as the bootstrap-calibrated
+coefficient used for interval calculation. \cr
+
+If \code{algorithm} is set to "MS22mod", both limits of the prediction interval
+are calibrated independently from each other. The resulting prediction interval
+is given by
+
+\deqn{[l,u] = \Big[\hat{\mu} - q^{calib}_l \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c}, \text{   }
+\hat{\mu} + q^{calib}_u \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c} \Big].}
+
+Please note, that this modification does not affect the calibration procedure, if only
+prediction limits are of interest. \cr
+
+This function is an direct implementation of the PI given in Menssen and Schaarschmidt
+2022 section 3.2.4.
 }
 \examples{
 # loading lme4
@@ -89,17 +98,19 @@ fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)
 summary(fit)
 
 # Prediction interval using c2_dat2 as future data
-\donttest{lmer_pi_unstruc(model=fit, newdat=c2_dat2, alternative="both", nboot=100)}
+\donttest{pred_int <- lmer_pi_unstruc(model=fit, newdat=c2_dat2, alternative="both", nboot=100)
+summary(pred_int)}
 
 # Upper prediction limit for m=3 future observations
-\donttest{lmer_pi_unstruc(model=fit, m=3, alternative="upper", nboot=100)}
+\donttest{pred_u <- lmer_pi_unstruc(model=fit, m=3, alternative="upper", nboot=100)
+summary(pred_u)}
 
 # Please note that nboot was set to 100 in order to decrease computing time
 # of the example. For a valid analysis set nboot=10000.
 
 }
 \references{
-Menssen and Schaarschmidt (2021): Prediction intervals for all of M future
+Menssen and Schaarschmidt (2022): Prediction intervals for all of M future
 observations based on linear random effects models. Statistica Neerlandica,
  \doi{10.1111/stan.12260}
 }

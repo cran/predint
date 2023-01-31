@@ -5,18 +5,19 @@
 \alias{qp_dat1}
 \title{Quasi-Poisson data (example 1)}
 \format{
-An integer vector with ten entries containing quasi-Poisson data
+A data.frame with two columns
 }
 \usage{
 qp_dat1
 }
 \description{
-This data set contains sampled quasi-poisson data for 10 clusters.
+This data set contains sampled quasi-Poisson data for 10 clusters.
 The data set was sampled with \code{rqpois(n=10, lambda=50, phi=3)}.
 }
 \examples{
-# Upper prediction limit for m=3 future observations
-quasi_pois_pi(histdat=data.frame(qp_dat1), m=3, alternative="upper", nboot=100)
+# Prediction interval using bb_dat2 as future data
+pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+summary(pred_int)
 
 # Please note that nboot was set to 100 in order to decrease computing time
 # of the example. For a valid analysis set nboot=10000.

@@ -1,10 +1,10 @@
 
-#' Prediction intervals for future observations based on linear random effects models
+#' Prediction intervals for future observations based on linear random effects models (DEPRECATED)
 #'
 #' This function is deprecated. Please use \code{lmer_pi_unstruc()},
 #' \code{lmer_pi_futvec()} or \code{lmer_pi_futmat()}.
 #'
-#' @param model a random effects model of class lmerMod
+#' @param model a random effects model of class \code{"lmerMod"}
 #' @param newdat a \code{data.frame} with the same column names as the historical data
 #' on which the model depends
 #' @param m number of future observations
@@ -14,7 +14,7 @@
 #' @param nboot number of bootstraps
 #' @param lambda_min lower start value for bisection
 #' @param lambda_max upper start value for bisection
-#' @param traceplot plot for visualization of the bisection process
+#' @param traceplot if \code{TRUE}: plot for visualization of the bisection process
 #' @param n_bisec maximal number of bisection steps
 #'
 #' @details This function returns a bootstrap calibrated prediction interval
@@ -53,21 +53,10 @@
 #'
 #' @examples
 #'
-#' # loading lme4
-#' library(lme4)
-#'
-#' # Fitting a random effects model based on c2_dat_1
-#' fit <- lmer(y_ijk~(1|a)+(1|b)+(1|a:b), c2_dat1)
-#' summary(fit)
-#'
-#' # Prediction interval using c2_dat2 as future data
-#' \donttest{lmer_pi(model=fit, newdat=c2_dat2, alternative="both", nboot=100)}
-#'
-#' # Upper prediction limit for m=3 future observations
-#' \donttest{lmer_pi(model=fit, m=3, alternative="upper", nboot=100)}
-#'
-#' # Please note that nboot was set to 100 in order to decrease computing time
-#' # of the example. For a valid analysis set nboot=10000.
+#' # This function is deprecated.
+#' # Please use lmer_pi_unstruc() if you want exactly the same functionality.
+#' # Please use lmer_pi_futmat() or lmer_pi_futvec() if you want to take care
+#' # of the future experimental design
 #'
 lmer_pi <- function(model,
                     newdat=NULL,
@@ -80,8 +69,7 @@ lmer_pi <- function(model,
                     traceplot=TRUE,
                     n_bisec=30){
 
-        warning("This function is deprecated and will be deleted soon.
-                Please use lmer_pi_unstruc() which has exactly the same functionality.")
+        stop("This function is deprecated. \n Please use lmer_pi_unstruc() if you want exactly the same functionality. \n Please use lmer_pi_futmat() or lmer_pi_futvec() if you want to take care of the future experimental design")
 
         # Model must be of class lmerMod
         if(!is(model, "lmerMod")){

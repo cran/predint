@@ -16,7 +16,8 @@
 #' @examples
 #' # Upper prediction limit for m=3 future number of successes
 #' # that are based on cluster sizes 40, 50, 60 respectively
-#' beta_bin_pi(histdat=bb_dat1, newsize=c(40, 50, 60), alternative="upper", nboot=100)
+#' pred_int <- beta_bin_pi(histdat=bb_dat1, newsize=c(40, 50, 60), alternative="upper", nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -40,7 +41,8 @@
 #'
 #' @examples
 #' # Prediction interval using bb_dat2 as future data
-#' beta_bin_pi(histdat=bb_dat1, newdat=bb_dat2, nboot=100)
+#' pred_int <- beta_bin_pi(histdat=bb_dat1, newdat=bb_dat2, nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -53,7 +55,7 @@
 
 #' Quasi-binomial data (example 1)
 #'
-#' This data set contains sampled quasi-binomial data from from 10 clusters
+#' This data set contains sampled quasi-binomial data from 10 clusters
 #' each of size 50. The data set was sampled with \code{rqbinom(n=10, size=50, prob=0.1, phi=3)}.
 #'
 #' @format A \code{data.frame} with 3 rows and 2 columns:
@@ -66,7 +68,8 @@
 #' @examples
 #' # Upper prediction limit for m=3 future observations
 #' # that are based on cluster sizes 40, 50, 60 respectively
-#' quasi_bin_pi(histdat=qb_dat1, newsize=c(40, 50, 60), alternative="upper", nboot=100)
+#' pred_int <- quasi_bin_pi(histdat=qb_dat1, newsize=c(40, 50, 60), alternative="upper", nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -90,7 +93,8 @@
 #'
 #' @examples
 #' # Prediction interval using qb_dat2 as future data
-#' quasi_bin_pi(histdat=qb_dat1, newdat=qb_dat2, nboot=100)
+#' pred_int <- quasi_bin_pi(histdat=qb_dat1, newdat=qb_dat2, nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -103,14 +107,15 @@
 
 #' Quasi-Poisson data (example 1)
 #'
-#' This data set contains sampled quasi-poisson data for 10 clusters.
+#' This data set contains sampled quasi-Poisson data for 10 clusters.
 #' The data set was sampled with \code{rqpois(n=10, lambda=50, phi=3)}.
 #'
-#' @format An integer vector with ten entries containing quasi-Poisson data
+#' @format A data.frame with two columns
 #'
 #' @examples
-#' # Upper prediction limit for m=3 future observations
-#' quasi_pois_pi(histdat=data.frame(qp_dat1), m=3, alternative="upper", nboot=100)
+#' # Prediction interval using bb_dat2 as future data
+#' pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -122,14 +127,15 @@
 
 #' Quasi-Poisson data (example 2)
 #'
-#' This data set contains sampled quasi-poisson data for 3 clusters.
+#' This data set contains sampled quasi-Poisson data for 3 clusters.
 #' The data set was sampled with \code{rqpois(n=3, lambda=50, phi=3)}.
 #'
-#' @format An integer vector with three entries containing quasi-Poisson data
+#' @format A data.frame with two columns
 #'
 #' @examples
-#' # Prediction interval using qp_dat2 as future data
-#' quasi_pois_pi(histdat=data.frame(qp_dat1), newdat=data.frame(qp_dat2), nboot=100)
+#' # Prediction interval using bb_dat2 as future data
+#' pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+#' summary(pred_int)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -161,7 +167,8 @@
 #' summary(fit)
 #'
 #' # Upper prediction limit for m=3 future observations
-#' \donttest{lmer_pi_unstruc(model=fit, m=3, alternative="upper", nboot=100)}
+#' \donttest{pred_int <- lmer_pi_unstruc(model=fit, m=3, alternative="upper", nboot=100)
+#' summary(pred_int)}
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -192,7 +199,8 @@
 #' summary(fit)
 #'
 #' # Prediction interval using c2_dat2 as future data
-#' \donttest{lmer_pi_unstruc(model=fit, newdat=c2_dat2, alternative="both", nboot=100)}
+#' \donttest{pred_int <- lmer_pi_unstruc(model=fit, newdat=c2_dat2, alternative="both", nboot=100)
+#' summary(pred_int)}
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -232,7 +240,8 @@
 #' futvec <- c(1, 2, 4, 5, 10, 11, 13, 14)
 #'
 #' # Calculating the PI
-#' lmer_pi_futvec(model=fit, futvec=futvec, alternative="both", nboot=100)}
+#' pred_int <- lmer_pi_futvec(model=fit, futvec=futvec, alternative="both", nboot=100)
+#' summary(pred_int)}
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
@@ -293,8 +302,8 @@
 #' # process.
 #'
 #' # Calculate the PI
-#' lmer_pi_futmat(model=fit, futmat_list=fml, alternative="both", nboot=100)
-#'
+#' pred_int <- lmer_pi_futmat(model=fit, futmat_list=fml, alternative="both", nboot=100)
+#' summary(pred_int)
 #' # Please note that nboot was set to 100 in order to decrease computing time
 #' # of the example. For a valid analysis set nboot=10000.
 #'

@@ -15,7 +15,8 @@ lmer_pi_futvec(
   delta_max = 10,
   tolerance = 0.001,
   traceplot = TRUE,
-  n_bisec = 30
+  n_bisec = 30,
+  algorithm = "MS22"
 )
 }
 \arguments{
@@ -41,51 +42,54 @@ if a prediction interval or an upper or a lower prediction limit should be compu
 
 \item{tolerance}{tolerance for the coverage probability in the bisection}
 
-\item{traceplot}{plot for visualization of the bisection process}
+\item{traceplot}{if \code{TRUE}: Plot for visualization of the bisection process}
 
 \item{n_bisec}{maximal number of bisection steps}
+
+\item{algorithm}{either "MS22" or "MS22mod" (see details)}
 }
 \value{
-If \code{newdat} is specified: A \code{data.frame} that contains the future data,
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction standard error (pred_se), the prediction interval (lower and upper)
- and a statement if the prediction interval covers the future observations (cover).
-
- If only \code{futvec} is specified:
- A \code{data.frame} that contains the number of future observations (m)
- the historical mean (hist_mean), the calibrated coefficient (quant_calib),
- the prediction standard error (pred_se) and the prediction interval (lower and upper).
- If \code{futvec} is set to 1, the PI is calculated for one future observation.
-
- If \code{alternative} is set to "lower": Lower prediction limits are computed instead
- of a prediction interval.
-
- If \code{alternative} is set to "upper": Upper prediction limits are computed instead
- of a prediction interval.
-
- If traceplot=TRUE, a graphical overview about the bisection process is given.
+\code{lmer_pi_futvec()} returns an object of class \code{c("predint", "normalPI")}
+with prediction intervals or limits in the first entry (\code{$prediction}).
 }
 \description{
-lmer_pi_futvec calculates a bootstrap calibrated prediction interval for one or more
+\code{lmer_pi_futvec()} calculates a bootstrap calibrated prediction interval for one or more
 future observation(s) based on linear random effects models. With this approach,
-the sampling structure of the future data is taken into account (see below).
+the experimental design of the future data is taken into account (see below).
 }
 \details{
-This function returns a bootstrap calibrated prediction interval
-\deqn{[l,u] = \hat{y} \pm q \sqrt{\hat{var}(\hat{y} - y)}}
-with \eqn{\hat{y}} as the predicted future observation,
-\eqn{y} as the observed future observations, \eqn{\sqrt{\hat{var}(\hat{y} - y)}}
-as the prediction standard error and \eqn{q} as the bootstrap calibrated coefficient that
-approximates a quantile of the multivariate t-distribution. \cr
-Please note that this function relies on linear random effects models that are
-fitted with \code{lmer()} from the lme4 package. Random effects have to be specified as
-\code{(1|random_effect)}.
+This function returns bootstrap-calibrated prediction intervals as well as
+lower or upper prediction limits.
+
+If \code{algorithm} is set to "MS22", both limits of the prediction interval
+are calibrated simultaneously using the algorithm described in Menssen and
+Schaarschmidt (2022), section 3.2.4. The calibrated prediction interval is given
+as
+
+\deqn{[l,u] = \hat{\mu} \pm q^{calib} \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1}
+\hat{\sigma}^2_c}}
+
+with \eqn{\hat{\mu}} as the expected future observation (historical mean) and
+\eqn{\hat{\sigma}^2_c} as the \eqn{c=1, 2, ..., C} variance components and \eqn{\hat{\sigma}^2_{C+1}}
+as the residual variance obtained from the random
+effects model fitted with \code{lme4::lmer()} and \eqn{q^{calib}} as the as the bootstrap-calibrated
+coefficient used for interval calculation. \cr
+
+If \code{algorithm} is set to "MS22mod", both limits of the prediction interval
+are calibrated independently from each other. The resulting prediction interval
+is given by
+
+\deqn{[l,u] = \Big[\hat{\mu} - q^{calib}_l \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c}, \text{   }
+\hat{\mu} + q^{calib}_u \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c} \Big].}
+
+Please note, that this modification does not affect the calibration procedure, if only
+prediction limits are of interest. \cr
 
 Be aware that the sampling structure of the historical data must contain the structure of the
 future data. This means that the observations per random factor must be less or
 equal in the future data compared to the historical data.
 
-This function is an implementation of the PI given in Menssen and Schaarschmidt 2021 section 3.2.4
+This function is an implementation of the PI given in Menssen and Schaarschmidt 2022 section 3.2.4
 except that the bootstrap calibration values are drawn from bootstrap samples that
 mimic the future data.
 }
@@ -108,17 +112,20 @@ summary(fit)
 futvec <- c(1, 2, 4, 5, 10, 11, 13, 14)
 
 # Calculating the PI
-\donttest{lmer_pi_futvec(model=fit, futvec=futvec, alternative="both", nboot=100)}
+\donttest{pred_int <- lmer_pi_futvec(model=fit, futvec=futvec, nboot=100)
+summary(pred_int)}
 
 #----------------------------------------------------------------------------
 
 ### Calculating the PI with c2_dat3 printed in the output
-\donttest{lmer_pi_futvec(model=fit, futvec=futvec, newdat=c2_dat3, alternative="both", nboot=100)}
+\donttest{pred_int_new <- lmer_pi_futvec(model=fit, futvec=futvec, newdat=c2_dat3, nboot=100)
+summary(pred_int_new)}
 
 #----------------------------------------------------------------------------
 
 ### Upper prediction limit for m=1 future observation
-\donttest{lmer_pi_futvec(model=fit, futvec=1, alternative="upper", nboot=100)}
+\donttest{pred_u <- lmer_pi_futvec(model=fit, futvec=1, alternative="upper", nboot=100)
+summary(pred_u)}
 
 #----------------------------------------------------------------------------
 
@@ -127,7 +134,7 @@ futvec <- c(1, 2, 4, 5, 10, 11, 13, 14)
 
 }
 \references{
-Menssen, M., Schaarschmidt, F.: Prediction intervals for all of M
-future observations based on linear random effects models. Statistica Neerlandica.
-\doi{10.1111/stan.12260}
+Menssen and Schaarschmidt (2022): Prediction intervals for all of M future
+observations based on linear random effects models. Statistica Neerlandica,
+ \doi{10.1111/stan.12260}
 }
