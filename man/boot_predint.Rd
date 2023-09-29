@@ -7,7 +7,8 @@
 boot_predint(pred_int, nboot)
 }
 \arguments{
-\item{pred_int}{object of class \code{c("quasiPoissonPI", "betaBinomialPI", "quasiBinomialPI")}}
+\item{pred_int}{object of class \code{c("quasiPoissonPI", "betaBinomialPI",
+"quasiBinomialPI", negativeBinomialPI)}}
 
 \item{nboot}{number of bootstraps}
 }
@@ -22,7 +23,7 @@ uncalibrated prediction intervals implemented in predint.
 }
 \details{
 This function only works for binomial and Poisson type data. For the sampling
-of new data from random effects models see \code{lmer_bs()}.
+of new data from random effects models see \code{\link{lmer_bs}}.
 }
 \examples{
 # Simple quasi-Poisson PI
@@ -33,7 +34,7 @@ test_boot <- boot_predint(pred_int = test_pi, nboot=50)
 str(test_boot)
 summary(test_boot)
 
-# Please note that the low number of bootstrap samples was choosen in order to
-# decrease computing time. For valid analysis draw at least 5000 bootstrap samples.
+# Please note that the low number of bootstrap samples was chosen in order to
+# decrease computing time. For valid analysis draw at least 10000 bootstrap samples.
 
 }

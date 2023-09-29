@@ -43,7 +43,7 @@
 #' are calibrated independently from each other. The resulting prediction interval
 #' is given by
 #'
-#' \deqn{[l,u] = \Big[\hat{\mu} - q^{calib}_l \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c}, \text{   }
+#' \deqn{[l,u] = \Big[\hat{\mu} - q^{calib}_l \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c}, \quad
 #' \hat{\mu} + q^{calib}_u \sqrt{\widehat{var}(\hat{\mu}) + \sum_{c=1}^{C+1} \hat{\sigma}^2_c} \Big].}
 #'
 #' Please note, that this modification does not affect the calibration procedure, if only
@@ -205,7 +205,7 @@ lmer_pi_futvec <- function(model,
 
                 # colnames of historical data and new data must be the same
                 if(all(colnames(model@frame) == colnames(newdat))==FALSE){
-                        stop("columnames of historical data and newdat are not the same")
+                        stop("colnames(model@frame) and colnames(newdat) are not the same.\nHave you transformed the depenent variable within the lmer() call?\nAt their current stage, the lmer_pi_... functions do not work with\ntransformations inside lmer()")
                 }
 
                 #

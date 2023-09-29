@@ -81,9 +81,9 @@ If \code{algorithm} is set to "MS22mod", both limits of the prediction interval
 are calibrated independently from each other. The resulting prediction interval
 is given by
 
-\deqn{[l,u] = \Big[n^*_m \hat{\lambda} \pm q^{calib}_l \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+\deqn{[l,u] = \Big[n^*_m \hat{\lambda} - q^{calib}_l \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
  \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}}, \quad
- n^*_m \hat{\lambda} \pm q^{calib}_u \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+ n^*_m \hat{\lambda} + q^{calib}_u \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
  \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}} \Big]}
 
 Please note, that this modification does not affect the calibration procedure, if only
@@ -96,12 +96,12 @@ qp_dat1
 # Future data
 qp_dat2
 
-# Prediction interval using bb_dat2 as future data
-pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+# Pointwise prediction interval
+pred_int <- quasi_pois_pi(histdat=ames_HCD, newoffset=3, nboot=100)
 summary(pred_int)
 
-# Upper prediction bound for m=3 future observations
-pred_u <- quasi_pois_pi(histdat=qp_dat1, newoffset=c(1,2,1), alternative="upper", nboot=100)
+# Pointwise upper prediction
+pred_u <- quasi_pois_pi(histdat=ames_HCD, newoffset=3, alternative="upper", nboot=100)
 summary(pred_u)
 
 # Please note that nboot was set to 100 in order to decrease computing time

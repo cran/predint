@@ -48,9 +48,9 @@
 #' are calibrated independently from each other. The resulting prediction interval
 #' is given by
 #'
-#' \deqn{[l,u] = \Big[n^*_m \hat{\lambda} \pm q^{calib}_l \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+#' \deqn{[l,u] = \Big[n^*_m \hat{\lambda} - q^{calib}_l \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
 #'  \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}}, \quad
-#'  n^*_m \hat{\lambda} \pm q^{calib}_u \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
+#'  n^*_m \hat{\lambda} + q^{calib}_u \sqrt{n^*_m \hat{\phi} \hat{\lambda} +
 #'  \frac{n^{*2}_m \hat{\phi} \hat{\lambda}}{\sum_h n_h}} \Big]}
 #'
 #' Please note, that this modification does not affect the calibration procedure, if only
@@ -75,12 +75,12 @@
 #' # Future data
 #' qp_dat2
 #'
-#' # Prediction interval using bb_dat2 as future data
-#' pred_int <- quasi_pois_pi(histdat=qp_dat1, newdat=qp_dat2, nboot=100)
+#' # Pointwise prediction interval
+#' pred_int <- quasi_pois_pi(histdat=ames_HCD, newoffset=3, nboot=100)
 #' summary(pred_int)
 #'
-#' # Upper prediction bound for m=3 future observations
-#' pred_u <- quasi_pois_pi(histdat=qp_dat1, newoffset=c(1,2,1), alternative="upper", nboot=100)
+#' # Pointwise upper prediction
+#' pred_u <- quasi_pois_pi(histdat=ames_HCD, newoffset=3, alternative="upper", nboot=100)
 #' summary(pred_u)
 #'
 #' # Please note that nboot was set to 100 in order to decrease computing time
@@ -160,6 +160,10 @@ quasi_pois_pi <- function(histdat,
 
                 if(!isTRUE(all(newdat[,1] == floor(newdat[,1])))){
                         stop("the future observations have to be integers")
+                }
+
+                if(any((colnames(histdat) == colnames(newdat))==FALSE)){
+                        stop("histdat and newdat have to have the same colnames")
                 }
         }
 
@@ -372,15 +376,15 @@ quasi_pois_pi <- function(histdat,
                 # Modified version of M and S 21
                 if(algorithm=="MS22mod"){
                         quant_calib_lower <- bisection(y_star_hat = y_star_hat_m_list,
-                                                 pred_se = pred_se_m_list,
-                                                 y_star = bs_y_star,
-                                                 alternative = "lower",
-                                                 quant_min = delta_min,
-                                                 quant_max = delta_max,
-                                                 n_bisec = n_bisec,
-                                                 tol = tolerance,
-                                                 alpha = alpha/2,
-                                                 traceplot=traceplot)
+                                                       pred_se = pred_se_m_list,
+                                                       y_star = bs_y_star,
+                                                       alternative = "lower",
+                                                       quant_min = delta_min,
+                                                       quant_max = delta_max,
+                                                       n_bisec = n_bisec,
+                                                       tol = tolerance,
+                                                       alpha = alpha/2,
+                                                       traceplot=traceplot)
 
                         quant_calib_upper <- bisection(y_star_hat = y_star_hat_m_list,
                                                        pred_se = pred_se_m_list,

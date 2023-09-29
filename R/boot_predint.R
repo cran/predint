@@ -7,11 +7,12 @@
 #' \code{boot_predint()} is a helper function to bootstrap new data from the simple
 #' uncalibrated prediction intervals implemented in predint.
 #'
-#' @param pred_int object of class \code{c("quasiPoissonPI", "betaBinomialPI", "quasiBinomialPI")}
+#' @param pred_int object of class \code{c("quasiPoissonPI", "betaBinomialPI",
+#' "quasiBinomialPI", negativeBinomialPI)}
 #' @param nboot number of bootstraps
 #'
 #' @details This function only works for binomial and Poisson type data. For the sampling
-#' of new data from random effects models see \code{lmer_bs()}.
+#' of new data from random effects models see \code{\link{lmer_bs}}.
 #'
 #' @return \code{boot_predint} returns an object of class \code{c("predint", "bootstrap")}
 #' which is a list with two entries: One for bootstrapped historical observations
@@ -28,8 +29,8 @@
 #' str(test_boot)
 #' summary(test_boot)
 #'
-#' # Please note that the low number of bootstrap samples was choosen in order to
-#' # decrease computing time. For valid analysis draw at least 5000 bootstrap samples.
+#' # Please note that the low number of bootstrap samples was chosen in order to
+#' # decrease computing time. For valid analysis draw at least 10000 bootstrap samples.
 #'
 boot_predint <- function(pred_int, nboot){
 
@@ -69,6 +70,51 @@ boot_predint <- function(pred_int, nboot){
                                         rqpois(n=length(histoffset),
                                                lambda=lambda,
                                                phi=phi,
+                                               offset=histoffset),
+                                        simplify = FALSE)
+
+                # Define output object
+                out_list <- list(bs_futdat=bs_futdat,
+                                 bs_histdat=bs_histdat)
+
+                # Set class for output object
+                out_s3 <- structure(out_list,
+                                    class=c("predint", "bootstrap"))
+
+                return(out_s3)
+        }
+
+        #-----------------------------------------------------------------------
+        ### If the PI is negative binomial
+
+        if(inherits(pred_int, "negativeBinomialPI")){
+
+                # get the future offsets
+                newoffset <- pred_int$newoffset
+
+                # get the historical offsets
+                histoffset <- pred_int$histoffset
+
+                # get the Poisson mean
+                lambda <- pred_int$lambda
+
+                # Get the dispersion parameter
+                kappa <- pred_int$kappa
+
+                # Sampling of future data
+                bs_futdat <- replicate(n=nboot,
+                                       rnbinom(n=length(newoffset),
+                                              lambda=lambda,
+                                              kappa=kappa,
+                                              offset=newoffset),
+                                       simplify = FALSE)
+
+
+                # Sampling of historical data
+                bs_histdat <- replicate(n=nboot,
+                                        rnbinom(n=length(histoffset),
+                                               lambda=lambda,
+                                               kappa=kappa,
                                                offset=histoffset),
                                         simplify = FALSE)
 

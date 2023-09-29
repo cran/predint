@@ -17,9 +17,9 @@ bb_pi(
 )
 }
 \arguments{
-\item{newsize}{number of experimental units in the historical clusters.}
+\item{newsize}{number of experimental units in the historical clusters}
 
-\item{histsize}{number of experimental units in the future clusters.}
+\item{histsize}{number of experimental units in the future clusters}
 
 \item{pi}{binomial proportion}
 
@@ -31,7 +31,7 @@ bb_pi(
 \code{alternative} specifies, if a prediction interval or
 an upper or a lower prediction limit should be computed}
 
-\item{newdat}{additional argument to specify the actual data set}
+\item{newdat}{additional argument to specify the current data set}
 
 \item{histdat}{additional argument to specify the historical data set}
 
@@ -45,7 +45,7 @@ with prediction intervals or limits in the first entry (\code{$prediction}).
 }
 \description{
 \code{bb_pi()} is a helper function that is internally called by \code{beta_bin_pi()}. It
-calculates simple uncalibrated prediction intervals for binomial
+calculates simple uncalibrated prediction intervals for binary
 data with overdispersion changing between the clusters (beta-binomial).
 }
 \details{
@@ -62,6 +62,7 @@ The direct application of this uncalibrated prediction interval to real life dat
 is not recommended. Please use \code{beta_bin_pi()} for real life applications.  \cr
 }
 \examples{
+# Pointwise uncalibrated PI
 bb_pred <- bb_pi(newsize=c(50), pi=0.3, rho=0.05, histsize=rep(50, 20), q=qnorm(1-0.05/2))
 summary(bb_pred)
 

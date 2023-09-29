@@ -1,3 +1,5 @@
+# predint 2.2.0
+
 # predint 1.0.0
 
 * This is the first version of predint
@@ -32,4 +34,16 @@ functions are lmer_pi_unstruc(), lmer_pi_futvec() and lmer_pi_futmat().
     - print.predint
 
 
+# predint 2.1.0
+
+* New real life data 
+  - Mortality of mice
+  - revertant bacteria colonies
+
+* new functions
+  - rnbinom
+  - nb_pi
+  - neg_bin_pi
+
+* plot works now with uncalibrated PI
 

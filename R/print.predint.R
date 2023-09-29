@@ -1,5 +1,5 @@
 
-#' Print function for objects of class \code{predint}
+#' Print objects of class \code{predint}
 #'
 #' @param x an object of class \code{predint}
 #' @param ... additional arguments passed over to \code{base::cbind()} and \code{base::data.frame()}
@@ -121,9 +121,9 @@ print.predint <- function(x, ...){
         }
 
         #-----------------------------------------------------------------------
-        ### Quasi-Poisson PI
+        ### Quasi-Poisson  or negative-binomial PI
 
-        if(inherits(x, "quasiPoissonPI")){
+        if(inherits(x, "quasiPoissonPI") | inherits(x, "negativeBinomialPI")){
 
                 # alternative = both
                 if(x$alternative == "both"){
