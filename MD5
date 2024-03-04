@@ -1,6 +1,6 @@
-abcf8185a7daa0e74f333e9ac49c529d *DESCRIPTION
+d94c2c171a367424f8fc79bc81246b87 *DESCRIPTION
 b0bc920ec3bf85c72eb13c9184812a2d *NAMESPACE
-222209ab5ab48db95b584a84a05a1eba *NEWS.md
+d465f42ee04b9b398bccc2a7950de3b6 *NEWS.md
 4e908c1bd0b584fbb942428d719452bc *R/as.data.frame.predint.R
 22fb72dc056d0d2f196e6e1b7349122f *R/bb_pi.R
 e9fcb9dca4e694968a1e99400b9eef65 *R/beta_bin_pi.R
@@ -28,8 +28,8 @@ f2d82c375f0b13b0841c79db823fb57a *R/rnbinom.R
 3cbbc75af79277b259868706580054cf *R/rqbinom.R
 6e3d2322e5e3563ddb46f3a0350f7386 *R/rqpois.R
 e322ea998d0751f2342bdc230b949d59 *R/summary.predint.R
-2dd0e33f8d226e48f55a669c8b31d764 *README.md
-7080893e02c49cd296d4424b9be55069 *build/partial.rdb
+30105038286978bd490654ec9c1d7602 *README.md
+20c8d3f97d93e2e318a22508275b5a02 *build/partial.rdb
 7fc1e0764309d4a00c21a9a1fc3f963f *data/ames_HCD.RData
 520894b34e446576f7bbb8dce549f060 *data/bb_dat1.RData
 6d30fc7c3465aea5a7cc9cf72b030ab6 *data/bb_dat2.RData
@@ -56,7 +56,7 @@ d1a96fc59090e2e6bbf48ed506bdc107 *man/c2_dat2.Rd
 b35c589e95ec60aebfac846db2579c43 *man/c2_dat4.Rd
 0b3d3883d9dc702f6ee330f454cdee9b *man/figures/README-example-1.png
 32cb276b6dcaf4f2afe9e06868a42cfa *man/figures/README-pressure-1.png
-8be8b6c7114cb5676af40f2ae45dcd41 *man/figures/README-unnamed-chunk-2-1.png
+849879d97d6ba84eacaaf204e906ffe2 *man/figures/README-unnamed-chunk-2-1.png
 ea8f155c1df7b9bb555ad6c533a970ff *man/figures/README-unnamed-chunk-4-1.png
 a8e8b8e184b2b7df3a1690e6cde45f0c *man/lmer_bs.Rd
 ac0ea5816385bf23a3098f3e970cd5f2 *man/lmer_pi.Rd
@@ -84,7 +84,7 @@ a21c53d5919dae4c29cad8ab48634511 *man/quasi_bin_pi.Rd
 e643b134f6cbc1c0f3812e2a303f48b6 *man/rqpois.Rd
 ae92c82a69475612c2b6cdaabb7fda12 *man/summary.predint.Rd
 f0c5b90d39d6ce4e3eeb2945db941221 *tests/testthat.R
-fb71d4b92e2edb1bf331229b4936b019 *tests/testthat/Rplots.pdf
+360561720bf55adcc22b55143e207f4b *tests/testthat/Rplots.pdf
 1d554ed73f582b8a2df1bb36aeb936cb *tests/testthat/test-as.data.frame.R
 6e50c0b8053e43d2dea64737dd2fa03d *tests/testthat/test-beta_bin_pi.R
 ecd3bb6d9d17d76012e90f44b42af8f6 *tests/testthat/test-beta_bin_pi_rho_estimation.R
@@ -95,7 +95,7 @@ f8557d0cb54b7c5cb53f7c32b5db6abc *tests/testthat/test-bisection.R
 452f4db3fd67aedef2e3b9212acc2381 *tests/testthat/test-lmer_pi_futvec.R
 9f3806d524fd0a9d10f06ef4ba15adbe *tests/testthat/test-lmer_pi_unstruc.R
 b2b5f36540ae17e5cbcb471923ca9437 *tests/testthat/test-neg_bin_pi.R
-f4baea2affb0c8c56c180ce114d8c91d *tests/testthat/test-plot.R
+0527fa8c5609e8c0ce2aa530302d9caf *tests/testthat/test-plot.R
 450acba521d366d9a19dcd6da85a3d4a *tests/testthat/test-quasi_bin_pi.R
 efa36520245bf01c56338bf086fcba94 *tests/testthat/test-quasi_bin_sampling.R
 6a372a1c26d4bfed4ef0984923c41e6c *tests/testthat/test-quasi_pois_pi.R

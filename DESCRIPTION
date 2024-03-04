@@ -1,7 +1,7 @@
 Package: predint
 Type: Package
 Title: Prediction Intervals
-Version: 2.2.0
+Version: 2.2.1
 Authors@R: person("Max", "Menssen", email = "menssen@cell.uni-hannover.de",
                   role = c("aut", "cre"))
 Description: An implementation of prediction intervals for overdispersed count data,
@@ -17,8 +17,8 @@ Depends: R (>= 3.5.0), ggplot2, lme4, MASS
 URL: https://github.com/MaxMenssen/predint
 BugReports: https://github.com/MaxMenssen/predint/issues
 NeedsCompilation: no
-Packaged: 2023-09-29 11:16:56 UTC; maxmenssen
+Packaged: 2024-03-04 10:25:57 UTC; maxmenssen
 Author: Max Menssen [aut, cre]
 Maintainer: Max Menssen <menssen@cell.uni-hannover.de>
 Repository: CRAN
-Date/Publication: 2023-09-29 11:50:05 UTC
+Date/Publication: 2024-03-04 15:10:03 UTC
